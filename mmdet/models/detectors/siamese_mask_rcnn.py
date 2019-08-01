@@ -25,6 +25,8 @@ class SiameseMaskRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin,
                  test_cfg=None,
                  pretrained=None):
         super(SiameseMaskRCNN, self).__init__()
+        self.conv = nn.Conv2d(512, 256, 1)
+        self.avg = nn.AdaptiveAvgPool2d(1,1)
         self.backbone = builder.build_backbone(backbone)
 
         if neck is not None:
@@ -80,7 +82,15 @@ class SiameseMaskRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin,
             self.mask_head.init_weights()
             if not self.share_roi_extractor:
                 self.mask_roi_extractor.init_weights()
-                
+
+    def matching(self, If, Rf):
+        for i in range(len(Rf)):
+            Rf[i] = self.avg(Rf[i])
+            delta = If[i] - Rf[i]
+            If[i] = torch.cat((If[i], delta), dim=1)
+            If[i] = self.conv(If[i])
+        return If
+
     # 将输入的img变为tuple(query_img,reference_img)
     def extract_feat(self, img):
         If = self.backbone(img[0])
@@ -89,7 +99,8 @@ class SiameseMaskRCNN(BaseDetector, RPNTestMixin, BBoxTestMixin,
         Rf = self.backbone(img[1])
         if self.with_neck:
             Rf = self.neck(Rf)
-        return (If,Rf)
+        If = self.matching(If, Rf)
+        return If
 
     def forward_train(self,
                       img,
