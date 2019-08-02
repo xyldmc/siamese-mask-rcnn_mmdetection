@@ -25,6 +25,8 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
                  test_cfg=None,
                  pretrained=None):
         super(TwoStageDetector, self).__init__()
+        self.conv = nn.Conv2d(512, 256, 1)
+        self.avg = nn.AdaptiveAvgPool2d((1,1))
         self.backbone = builder.build_backbone(backbone)
 
         if neck is not None:
@@ -81,11 +83,27 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
             if not self.share_roi_extractor:
                 self.mask_roi_extractor.init_weights()
 
-    def extract_feat(self, img):
-        x = self.backbone(img)
+    def matching(self, If, Rf):
+        out = []
+        for i in range(len(Rf)):
+            # import ipdb;ipdb.set_trace()
+            rf = self.avg(Rf[i])
+            delta = If[i] - Rf[i]
+            conca = torch.cat((If[i], delta), dim=1)
+            out.append(self.conv(conca))
+        return out
+
+    # 将输入的img变为tuple(query_img,reference_img)
+    def extract_feat(self, img, img_meta):
+        If = self.backbone(img)
         if self.with_neck:
-            x = self.neck(x)
-        return x
+            If = self.neck(If)
+        Rf = torch.from_numpy(img_meta[0]['img']).unsqueeze(0).to(img.device)
+        Rf = self.backbone(Rf)
+        if self.with_neck:
+            Rf = self.neck(Rf)
+        If = self.matching(If, Rf)
+        return tuple(If)
 
     def forward_train(self,
                       img,
@@ -95,8 +113,7 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
                       gt_bboxes_ignore=None,
                       gt_masks=None,
                       proposals=None):
-        x = self.extract_feat(img)
-
+        x = self.extract_feat(img,img_meta)
         losses = dict()
 
         # RPN forward and loss

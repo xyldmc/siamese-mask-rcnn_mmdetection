@@ -248,12 +248,12 @@ class CustomDataset(Dataset):
 
         ori_shape = (img_info['height'], img_info['width'], 3)
         img_meta = dict(
+            img=img,
             ori_shape=ori_shape,
             img_shape=img_shape,
             pad_shape=pad_shape,
             scale_factor=scale_factor,
             flip=flip)
-
         data = dict(
             img=DC(to_tensor(img), stack=True),
             img_meta=DC(img_meta, cpu_only=True),
