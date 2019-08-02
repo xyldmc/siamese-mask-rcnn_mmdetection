@@ -89,7 +89,7 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
             # import ipdb;ipdb.set_trace()
             rf = self.avg(Rf[i])
             delta = If[i] - Rf[i]
-            conca = torch.cat((If[i], delta), dim=1)
+            conca = torch.cat((If[i], delta.abs()), dim=1)
             out.append(self.conv(conca))
         return out
 
