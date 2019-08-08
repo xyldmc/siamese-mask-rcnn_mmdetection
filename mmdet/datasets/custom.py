@@ -198,8 +198,9 @@ class CustomDataset(Dataset):
                 proposals = proposals[:, :4]
             else:
                 scores = None
-
+        self.split = 'Train'
         ann = self.get_ann_info(idx)
+        rf_img = ann['rf_img']
         gt_bboxes = ann['bboxes']
         gt_labels = ann['labels']
         if self.with_crowd:
@@ -222,6 +223,7 @@ class CustomDataset(Dataset):
         img_scale = random_scale(self.img_scales, self.multiscale_mode)
         img, img_shape, pad_shape, scale_factor = self.img_transform(
             img, img_scale, flip, keep_ratio=self.resize_keep_ratio)
+        rf_img, _, _, _ = self.img_transform(rf_img, (192, 192))
         img = img.copy()
         if self.with_seg:
             gt_seg = mmcv.imread(
@@ -248,7 +250,7 @@ class CustomDataset(Dataset):
 
         ori_shape = (img_info['height'], img_info['width'], 3)
         img_meta = dict(
-            img=img,
+            rf_img=rf_img,
             ori_shape=ori_shape,
             img_shape=img_shape,
             pad_shape=pad_shape,
@@ -283,7 +285,7 @@ class CustomDataset(Dataset):
         else:
             proposal = None
 
-        def prepare_single(img, scale, flip, proposal=None):
+        def prepare_single(img, scale, flip, proposal=None, rf_img=None):
             _img, img_shape, pad_shape, scale_factor = self.img_transform(
                 img, scale, flip, keep_ratio=self.resize_keep_ratio)
             _img = to_tensor(_img)
@@ -306,14 +308,20 @@ class CustomDataset(Dataset):
                 _proposal = to_tensor(_proposal)
             else:
                 _proposal = None
+            if rf_img is not None:
+                rf_img, _, _, _ = self.img_transform(rf_img, (192, 192))
+                _img_meta['rf_img'] = rf_img
             return _img, _img_meta, _proposal
 
         imgs = []
         img_metas = []
         proposals = []
+        self.split = 'Test'
+        ann = self.get_ann_info(idx)
+        rf_img = ann['rf_img']
         for scale in self.img_scales:
             _img, _img_meta, _proposal = prepare_single(
-                img, scale, False, proposal)
+                img, scale, False, proposal, rf_img)
             imgs.append(_img)
             img_metas.append(DC(_img_meta, cpu_only=True))
             proposals.append(_proposal)

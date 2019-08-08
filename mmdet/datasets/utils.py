@@ -6,6 +6,19 @@ import numpy as np
 import torch
 
 
+def prepare_rf(img, ann, cat):
+    flag = True
+    while flag:
+        index = np.random.randint(len(ann))
+        cat_rf = ann[index]['category_id']
+        if cat_rf == cat and not ann[index]['iscorwd']:
+            flag = False
+    x, y, w, h = ann[index]['bbox']
+    crop = img[y:h+1, x:w+1, :]
+    return crop
+
+
+
 def to_tensor(data):
     """Convert objects of various python types to :obj:`torch.Tensor`.
 

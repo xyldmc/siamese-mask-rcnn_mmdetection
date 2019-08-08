@@ -87,8 +87,8 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
         out = []
         for i in range(len(Rf)):
             # import ipdb;ipdb.set_trace()
-            rf = self.avg(Rf[i])
-            delta = If[i] - Rf[i]
+            rf_avg = self.avg(Rf[i])
+            delta = If[i] - rf_avg
             conca = torch.cat((If[i], delta.abs()), dim=1)
             out.append(self.conv(conca))
         return out
@@ -98,7 +98,11 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
         If = self.backbone(img)
         if self.with_neck:
             If = self.neck(If)
-        Rf = torch.from_numpy(img_meta[0]['img']).unsqueeze(0).to(img.device)
+        Rf = []
+        for i in range(len(img_meta)):
+            Rf_ = torch.from_numpy(img_meta[i]['rf_img']).unsqueeze(0).to(img.device)
+            Rf.append(Rf_)
+        Rf = torch.cat(Rf, dim=0)
         Rf = self.backbone(Rf)
         if self.with_neck:
             Rf = self.neck(Rf)

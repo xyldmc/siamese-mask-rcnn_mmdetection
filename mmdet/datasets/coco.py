@@ -1,8 +1,10 @@
 import numpy as np
 from pycocotools.coco import COCO
-
+import mmcv
+import os.path as osp
 from .custom import CustomDataset
 from .registry import DATASETS
+from .utils import prepare_rf
 
 
 @DATASETS.register_module
@@ -25,6 +27,21 @@ class CocoDataset(CustomDataset):
 
     def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
+
+        cats = self.coco.loadCats(self.coco.getCatIds())
+        nms = [cat['name'] for cat in cats]
+        self.cats = []
+        for i in range(2):
+            self.cats.append([])
+        for i in range(len(nms)):
+            if (i+1) % 4 == 0:
+                self.cats[1].append(nms[i])
+            else:
+                self.cats[0].append(nms[i])
+        # cat = np.random.choice(self.S1)
+        # catIds = self.coco.getCatIds(catNms=[cat]);
+        # imgIds = self.coco.getImgIds(catIds=catIds);
+
         self.cat_ids = self.coco.getCatIds()
         self.cat2label = {
             cat_id: i + 1
@@ -42,7 +59,7 @@ class CocoDataset(CustomDataset):
         img_id = self.img_infos[idx]['id']
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
         ann_info = self.coco.loadAnns(ann_ids)
-        return self._parse_ann_info(ann_info, self.with_mask)
+        return self._parse_ann_info(ann_info, img_id, self.split, self.with_mask)
 
     def _filter_imgs(self, min_size=32):
         """Filter images too small or without ground truths."""
@@ -55,7 +72,7 @@ class CocoDataset(CustomDataset):
                 valid_inds.append(i)
         return valid_inds
 
-    def _parse_ann_info(self, ann_info, with_mask=True):
+    def _parse_ann_info(self, ann_info, img_id, split='Train', with_mask=True):
         """Parse bbox and mask annotation.
 
         Args:
@@ -73,6 +90,27 @@ class CocoDataset(CustomDataset):
         # 1. mask: a binary map of the same size of the image.
         # 2. polys: each mask consists of one or several polys, each poly is a
         # list of float.
+
+        flag = True
+        if split == 'Train':
+            i = 0
+        else:
+            i = 1
+        while flag:
+            index = np.random.randint(len(ann_info))
+            cat = ann_info[index]['category_id']
+            for j in range(len(self.cats[i])):
+                if cat == self.cats[i][j]:
+                    flag = False
+
+        rf_ids = self.coco.getImgIds(catIds=[cat]);
+        rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
+        while rf_id == img_id:
+            rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
+        rf_ann = self.coco.getAnnIds(imgIds=rf_id)
+        rf_img = mmcv.imread(osp.join(self.img_prefix, self.img_infos[rf_id]['filename']))
+        rf_img = prepare_rf(rf_img, rf_ann, cat)
+
         if with_mask:
             gt_masks = []
             gt_mask_polys = []
@@ -86,9 +124,12 @@ class CocoDataset(CustomDataset):
             bbox = [x1, y1, x1 + w - 1, y1 + h - 1]
             if ann['iscrowd']:
                 gt_bboxes_ignore.append(bbox)
-            else:
+            elif ann['category_id'] == cat:
                 gt_bboxes.append(bbox)
-                gt_labels.append(self.cat2label[ann['category_id']])
+                # gt_labels.append(self.cat2label[ann['category_id']])
+                gt_labels.append(1)
+            else:
+                continue
             if with_mask:
                 gt_masks.append(self.coco.annToMask(ann))
                 mask_polys = [
@@ -110,7 +151,7 @@ class CocoDataset(CustomDataset):
             gt_bboxes_ignore = np.zeros((0, 4), dtype=np.float32)
 
         ann = dict(
-            bboxes=gt_bboxes, labels=gt_labels, bboxes_ignore=gt_bboxes_ignore)
+            rf_img=rf_img, bboxes=gt_bboxes, labels=gt_labels, bboxes_ignore=gt_bboxes_ignore)
 
         if with_mask:
             ann['masks'] = gt_masks
