@@ -26,7 +26,7 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
                  pretrained=None):
         super(TwoStageDetector, self).__init__()
         self.conv = nn.Conv2d(512, 256, 1)
-        self.avg = nn.AdaptiveAvgPool2d((1, 1))
+        self.avg = nn.AdaptiveAvgPool2d((1,1))
         self.backbone = builder.build_backbone(backbone)
 
         if neck is not None:
@@ -100,8 +100,7 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
             If = self.neck(If)
         Rf = []
         for i in range(len(img_meta)):
-            Rf_ = torch.from_numpy(img_meta[i]['rf_img']).unsqueeze(0).to(
-                img.device)
+            Rf_ = torch.from_numpy(img_meta[i]['rf_img']).unsqueeze(0).to(img.device)
             Rf.append(Rf_)
         Rf = torch.cat(Rf, dim=0)
         Rf = self.backbone(Rf)
@@ -118,7 +117,7 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
                       gt_bboxes_ignore=None,
                       gt_masks=None,
                       proposals=None):
-        x = self.extract_feat(img, img_meta)
+        x = self.extract_feat(img,img_meta)
         losses = dict()
 
         # RPN forward and loss

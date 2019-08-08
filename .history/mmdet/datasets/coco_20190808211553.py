@@ -96,7 +96,6 @@ class CocoDataset(CustomDataset):
             i = 0
         else:
             i = 1
-        cat = 0
         while flag:
             index = np.random.randint(len(ann_info))
             cat = ann_info[index]['category_id']

@@ -96,7 +96,6 @@ class CocoDataset(CustomDataset):
             i = 0
         else:
             i = 1
-        cat = 0
         while flag:
             index = np.random.randint(len(ann_info))
             cat = ann_info[index]['category_id']
@@ -104,7 +103,7 @@ class CocoDataset(CustomDataset):
                 if cat == self.cats[i][j]:
                     flag = False
 
-        rf_ids = self.coco.getImgIds(catIds=[cat])
+        rf_ids = self.coco.getImgIds(catIds=[cat]);
         rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
         while rf_id == img_id:
             rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
