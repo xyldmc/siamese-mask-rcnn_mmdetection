@@ -83,9 +83,6 @@ class CocoDataset(CustomDataset):
             dict: A dict containing the following keys: bboxes, bboxes_ignore,
                 labels, masks, mask_polys, poly_lens.
         """
-        print('here')
-        import ipdb
-        ipdb.set_trace()
         gt_bboxes = []
         gt_labels = []
         gt_bboxes_ignore = []
