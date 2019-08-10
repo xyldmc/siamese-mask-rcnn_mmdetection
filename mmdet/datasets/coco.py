@@ -106,8 +106,6 @@ class CocoDataset(CustomDataset):
                     print(cat)
                     flag = False
                     break
-        import ipdb
-        ipdb.set_trace()
         rf_ids = self.coco.getImgIds(catIds=[cat])
         rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
         while rf_id == img_id:

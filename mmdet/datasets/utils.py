@@ -7,6 +7,8 @@ import torch
 
 
 def prepare_rf(img, ann, cat):
+    import ipdb
+    ipdb.set_trace()
     flag = True
     while flag:
         index = np.random.randint(len(ann))
