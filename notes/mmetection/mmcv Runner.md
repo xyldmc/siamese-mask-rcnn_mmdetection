@@ -1,4 +1,4 @@
-## mmcv Runner
+## mmcv Runner（mmdetecion训练过程）
 
 #### Runner.run()
 
@@ -55,9 +55,11 @@ def run(self, data_loaders, workflow, max_epochs, **kwargs):
 
 ​     iter代表使用一个batch训练，epoc代表训练完一次data_set
 
+每个iter包括前向传播和反向传播过程，分别由batch_processor和after_train_iter这个hook（与optimizer有关）定义
+
 ```python
 def train(self, data_loader, **kwargs):
-    self.model.train()       #每一个epoc 调用一次，调用model的train函数   ？是pytorch的函数吗
+    self.model.train()       #每一个epoc 调用一次，调用model的train函数
     self.mode = 'train'
     self.data_loader = data_loader      
     self._max_iters = self._max_epochs * len(data_loader)    #到这里，dataloader应该是已经存     了data了，len(data_loader)应该代表 totoal_data / batch_size，即data_batch的数量
@@ -67,7 +69,7 @@ def train(self, data_loader, **kwargs):
         self._inner_iter = i
         self.call_hook('before_train_iter')    #定义在/hooks/lr_updater.py中，用于更新lr
         outputs = self.batch_processor(
-            self.model, data_batch, train_mode=True, **kwargs)      #这句话可能代表反向传播
+            self.model, data_batch, train_mode=True, **kwargs)      # 讲数据传入batch_processor进行前向传播
             # 每个iter调用一次
         if not isinstance(outputs, dict):
             raise TypeError('batch_processor() must return a dict')
