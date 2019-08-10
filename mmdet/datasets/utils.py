@@ -16,6 +16,10 @@ def prepare_rf(img, ann, cat):
         if cat_rf == cat and not ann[index]['iscrowd']:
             flag = False
     x, y, w, h = ann[index]['bbox']
+    x = int(x)
+    y = int(y)
+    w = int(w)
+    h = int(h)
     crop = img[y:h+1, x:w+1, :]
     return crop
 
