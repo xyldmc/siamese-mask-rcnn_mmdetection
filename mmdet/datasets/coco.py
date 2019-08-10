@@ -27,17 +27,17 @@ class CocoDataset(CustomDataset):
 
     def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
-
-        cats = self.coco.loadCats(self.coco.getCatIds())
-        nms = [cat['name'] for cat in cats]
+        catids = self.coco.getCatIds()
+        #cats = self.coco.loadCats(self.coco.getCatIds())
+        #nms = [cat['name'] for cat in cats]
         self.cats = []
         for i in range(2):
             self.cats.append([])
-        for i in range(len(nms)):
-            if (i+1) % 4 == 0:
-                self.cats[1].append(nms[i])
+        for i in range(len(catids)):
+            if (i + 1) % 4 == 0:
+                self.cats[1].append(i)
             else:
-                self.cats[0].append(nms[i])
+                self.cats[0].append(i)
         # cat = np.random.choice(self.S1)
         # catIds = self.coco.getCatIds(catNms=[cat]);
         # imgIds = self.coco.getImgIds(catIds=catIds);
@@ -59,7 +59,8 @@ class CocoDataset(CustomDataset):
         img_id = self.img_infos[idx]['id']
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
         ann_info = self.coco.loadAnns(ann_ids)
-        return self._parse_ann_info(ann_info, img_id, self.split, self.with_mask)
+        return self._parse_ann_info(ann_info, img_id, self.split,
+                                    self.with_mask)
 
     def _filter_imgs(self, min_size=32):
         """Filter images too small or without ground truths."""
@@ -112,7 +113,8 @@ class CocoDataset(CustomDataset):
         while rf_id == img_id:
             rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
         rf_ann = self.coco.getAnnIds(imgIds=rf_id)
-        rf_img = mmcv.imread(osp.join(self.img_prefix, self.img_infos[rf_id]['filename']))
+        rf_img = mmcv.imread(
+            osp.join(self.img_prefix, self.img_infos[rf_id]['filename']))
         rf_img = prepare_rf(rf_img, rf_ann, cat)
 
         if with_mask:
@@ -155,7 +157,10 @@ class CocoDataset(CustomDataset):
             gt_bboxes_ignore = np.zeros((0, 4), dtype=np.float32)
 
         ann = dict(
-            rf_img=rf_img, bboxes=gt_bboxes, labels=gt_labels, bboxes_ignore=gt_bboxes_ignore)
+            rf_img=rf_img,
+            bboxes=gt_bboxes,
+            labels=gt_labels,
+            bboxes_ignore=gt_bboxes_ignore)
 
         if with_mask:
             ann['masks'] = gt_masks
