@@ -13,7 +13,7 @@ def prepare_rf(img, ann, cat):
     while flag:
         index = np.random.randint(len(ann))
         cat_rf = ann[index]['category_id']
-        if cat_rf == cat and not ann[index]['iscorwd']:
+        if cat_rf == cat and not ann[index]['iscrowd']:
             flag = False
     x, y, w, h = ann[index]['bbox']
     crop = img[y:h+1, x:w+1, :]
