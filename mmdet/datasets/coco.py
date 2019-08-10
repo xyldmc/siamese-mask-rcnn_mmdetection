@@ -84,7 +84,6 @@ class CocoDataset(CustomDataset):
             dict: A dict containing the following keys: bboxes, bboxes_ignore,
                 labels, masks, mask_polys, poly_lens.
         """
-        print('here')
         import ipdb
         ipdb.set_trace()
         gt_bboxes = []
@@ -106,8 +105,10 @@ class CocoDataset(CustomDataset):
             cat = ann_info[index]['category_id']
             for j in range(len(self.cats[i])):
                 if cat == self.cats[i][j]:
+                    flag = False
                     break
-
+        import ipdb
+        ipdb.set_trace()
         rf_ids = self.coco.getImgIds(catIds=[cat])
         rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
         while rf_id == img_id:
