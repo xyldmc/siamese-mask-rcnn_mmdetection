@@ -106,7 +106,7 @@ class CocoDataset(CustomDataset):
             cat = ann_info[index]['category_id']
             for j in range(len(self.cats[i])):
                 if cat == self.cats[i][j]:
-                    flag = False
+                    break
 
         rf_ids = self.coco.getImgIds(catIds=[cat])
         rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
