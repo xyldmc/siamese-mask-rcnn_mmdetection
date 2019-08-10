@@ -110,7 +110,7 @@ class CocoDataset(CustomDataset):
         rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
         while rf_id == img_id:
             rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
-        rf_ann = self.coco.getAnnIds(imgIds=rf_id)
+        rf_ann = self.coco.loadAnns(self.coco.getAnnIds(imgIds=rf_id))
         rf_img_file = self.coco.loadImgs([rf_id])[0]['file_name']
         rf_img = mmcv.imread(
             osp.join(self.img_prefix, rf_img_file))
