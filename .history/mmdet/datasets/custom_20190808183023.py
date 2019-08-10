@@ -200,8 +200,6 @@ class CustomDataset(Dataset):
                 scores = None
         self.split = 'Train'
         ann = self.get_ann_info(idx)
-        import ipdb
-        ipdb.set_trace()
         rf_img = ann['rf_img']
         gt_bboxes = ann['bboxes']
         gt_labels = ann['labels']
