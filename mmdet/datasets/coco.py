@@ -84,8 +84,6 @@ class CocoDataset(CustomDataset):
             dict: A dict containing the following keys: bboxes, bboxes_ignore,
                 labels, masks, mask_polys, poly_lens.
         """
-        import ipdb
-        ipdb.set_trace()
         gt_bboxes = []
         gt_labels = []
         gt_bboxes_ignore = []
@@ -105,6 +103,7 @@ class CocoDataset(CustomDataset):
             cat = ann_info[index]['category_id']
             for j in range(len(self.cats[i])):
                 if cat == self.cats[i][j]:
+                    print(cat)
                     flag = False
                     break
         import ipdb
@@ -114,8 +113,9 @@ class CocoDataset(CustomDataset):
         while rf_id == img_id:
             rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
         rf_ann = self.coco.getAnnIds(imgIds=rf_id)
+        rf_img_file = self.coco.loadImgs([rf_id])[0]['fielname']
         rf_img = mmcv.imread(
-            osp.join(self.img_prefix, self.img_infos[rf_id]['filename']))
+            osp.join(self.img_prefix, rf_img_file))
         rf_img = prepare_rf(rf_img, rf_ann, cat)
 
         if with_mask:
