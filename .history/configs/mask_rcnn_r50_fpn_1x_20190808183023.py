@@ -121,8 +121,8 @@ data = dict(
     workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        # ann_file=data_root + 'annotations/instances_train2017.json',
-        # img_prefix=data_root + 'train2017/',
+        ann_file=data_root + 'annotations/instances_train2017.json',
+        img_prefix=data_root + 'train2017/',
         img_scale=(1024, 1024),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
@@ -173,7 +173,7 @@ log_config = dict(
 # yapf:enable
 evaluation = dict(interval=1)
 # runtime settings
-total_epochs = 1
+total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
 work_dir = './work_dirs/mask_rcnn_r50_fpn_1x'
