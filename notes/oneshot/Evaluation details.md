@@ -26,7 +26,7 @@
 
 
 
-![1](C:\personal\learning\note\1.PNG)
+![1](1.PNG)
 
 #### 随机采样引起的噪声
 
@@ -53,14 +53,14 @@ mAP50 is evaluated at a single Intersection over Union (IoU) threshold of 50% be
 
 ##### 总体结果（95%置信区间）
 
-![](C:\personal\learning\note\3.PNG)
+![](3.PNG)
 
 ##### detection结果（5次均值）
 
-![](C:\personal\learning\note\4.PNG)
+![](4.PNG)
 
 ##### segmentation结果（5次均值）
 
-![](C:\personal\learning\note\2.PNG)
+![](2.PNG)
 
 第二列重要，fiveshot的具体结果见原文

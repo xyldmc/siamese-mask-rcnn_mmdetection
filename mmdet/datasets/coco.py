@@ -28,8 +28,8 @@ class CocoDataset(CustomDataset):
     def load_annotations(self, ann_file):
         self.coco = COCO(ann_file)
         catids = self.coco.getCatIds()
-        #cats = self.coco.loadCats(self.coco.getCatIds())
-        #nms = [cat['name'] for cat in cats]
+        # cats = self.coco.loadCats(self.coco.getCatIds())
+        # nms = [cat['name'] for cat in cats]
         self.cats = []
         for i in range(2):
             self.cats.append([])
