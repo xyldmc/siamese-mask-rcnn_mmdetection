@@ -102,6 +102,7 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
         for i in range(len(img_meta)):
             Rf_ = torch.from_numpy(img_meta[i]['rf_img']).unsqueeze(0).to(
                 img.device)
+            import ipdb;ipdb.set_trace()
             Rf.append(Rf_)
         Rf = torch.cat(Rf, dim=0)
         Rf = self.backbone(Rf)

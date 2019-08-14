@@ -7,20 +7,13 @@ import torch
 
 
 def prepare_rf(img, ann, cat):
-    import ipdb
-    ipdb.set_trace()
-    flag = True
-    while flag:
+    while True:
         index = np.random.randint(len(ann))
         cat_rf = ann[index]['category_id']
         if cat_rf == cat and not ann[index]['iscrowd']:
-            flag = False
-    x, y, w, h = ann[index]['bbox']
-    x = int(x)
-    y = int(y)
-    w = int(w)
-    h = int(h)
-    crop = img[y:h+1, x:w+1, :]
+            break
+    x, y, w, h = np.array(ann[index]['bbox']).astype(int)
+    crop = img[y:y+h+1, x:x+w+1, :]
     return crop
 
 

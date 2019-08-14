@@ -35,9 +35,9 @@ class CocoDataset(CustomDataset):
             self.cats.append([])
         for i in range(len(catids)):
             if (i + 1) % 4 == 0:
-                self.cats[1].append(i)
+                self.cats[1].append(catids[i])
             else:
-                self.cats[0].append(i)
+                self.cats[0].append(catids[i])
         # cat = np.random.choice(self.S1)
         # catIds = self.coco.getCatIds(catNms=[cat]);
         # imgIds = self.coco.getImgIds(catIds=catIds);
@@ -92,25 +92,25 @@ class CocoDataset(CustomDataset):
         # 2. polys: each mask consists of one or several polys, each poly is a
         # list of float.
 
-        flag = True
         if split == 'Train':
             i = 0
         else:
             i = 1
-        cat = 0
+        flag = True
         while flag:
             index = np.random.randint(len(ann_info))
             cat = ann_info[index]['category_id']
             for j in range(len(self.cats[i])):
                 if cat == self.cats[i][j]:
-                    print(cat)
-                    flag = False
                     break
-        rf_ids = self.coco.getImgIds(catIds=[cat])
-        rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
-        while rf_id == img_id:
+
+            rf_ids = self.coco.getImgIds(catIds=[cat])
             rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
-        rf_ann = self.coco.loadAnns(self.coco.getAnnIds(imgIds=rf_id))
+            while rf_id == img_id:
+                rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
+            rf_ann = self.coco.loadAnns(self.coco.getAnnIds(imgIds=rf_id, iscrowd=False))
+            if len(rf_ann) > 0:
+                flag = False
         rf_img_file = self.coco.loadImgs([rf_id])[0]['file_name']
         rf_img = mmcv.imread(
             osp.join(self.img_prefix, rf_img_file))
