@@ -13,9 +13,14 @@ def prepare_rf(img, ann, cat):
         if cat_rf == cat and not ann[index]['iscrowd']:
             break
     x, y, w, h = np.array(ann[index]['bbox']).astype(int)
-    crop = img[y:y+h+1, x:x+w+1, :]
+    crop = img[y:y + h + 1, x:x + w + 1, :]
     return crop
 
+
+def prepare_rf_test(img, ann):
+    x, y, w, h = np.array(ann['bbox']).astype(int)
+    crop = img[y:y + h + 1, x:x + w + 1, :]
+    return crop
 
 
 def to_tensor(data):

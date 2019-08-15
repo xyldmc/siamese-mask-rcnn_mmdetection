@@ -62,7 +62,7 @@ class CustomDataset(Dataset):
         self.img_prefix = img_prefix
 
         # load annotations (and proposals)
-        self.img_infos = self.load_annotations(ann_file)
+        self.img_infos = self.load_annotations(ann_file, self.test_mode)
         if proposal_file is not None:
             self.proposals = self.load_proposals(proposal_file)
         else:
@@ -317,7 +317,7 @@ class CustomDataset(Dataset):
         img_metas = []
         proposals = []
         self.split = 'Test'
-        ann = self.get_ann_info(idx)
+        ann = self.get_ann_info(idx, self.test_mode)
         rf_img = ann['rf_img']
         for scale in self.img_scales:
             _img, _img_meta, _proposal = prepare_single(
