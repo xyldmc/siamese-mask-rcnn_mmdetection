@@ -23,6 +23,13 @@ def prepare_rf_test(img, ann):
     return crop
 
 
+def zero_pad(img):
+    _, h, w = img.shape
+    max_ = np.max(img.shape)
+    pad = np.pad(img,((0, 0), (0, max_-h), (0, max_-w)) , 'constant', constant_values = (0, 0))
+    return pad
+
+
 def to_tensor(data):
     """Convert objects of various python types to :obj:`torch.Tensor`.
 

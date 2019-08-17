@@ -60,22 +60,24 @@ class CocoDataset(CustomDataset):
                 for img_ann in img_anns:
                     if img_ann['category_id'] in img_cats:
                         continue
-                    else:
+                    elif img_ann['category_id'] in self.cats[1]:
                         img_cats.append(img_ann['category_id'])
                         tmp_info = copy.deepcopy(info)
                         tmp_info['category_id'] = img_ann['category_id']
                         img_infos.append(tmp_info)
+                    else:
+                        continue
             else:
                 info = self.coco.loadImgs([i])[0]
                 info['filename'] = info['file_name']
                 img_infos.append(info)
         return img_infos
 
-    def get_ann_info(self, idx, test_mode=False):
+    def get_ann_info(self, idx):
         img_id = self.img_infos[idx]['id']
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
         ann_info = self.coco.loadAnns(ann_ids)
-        if test_mode:
+        if not self.test_mode:
             return self._parse_ann_info(ann_info, img_id, self.split,
                                         self.with_mask)
         else:

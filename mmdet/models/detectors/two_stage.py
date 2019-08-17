@@ -102,7 +102,6 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
         for i in range(len(img_meta)):
             Rf_ = torch.from_numpy(img_meta[i]['rf_img']).unsqueeze(0).to(
                 img.device)
-            import ipdb;ipdb.set_trace()
             Rf.append(Rf_)
         Rf = torch.cat(Rf, dim=0)
         Rf = self.backbone(Rf)
@@ -219,7 +218,7 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
         """Test without augmentation."""
         assert self.with_bbox, "Bbox head must be implemented."
 
-        x = self.extract_feat(img)
+        x = self.extract_feat(img. img_meta)
 
         proposal_list = self.simple_test_rpn(
             x, img_meta, self.test_cfg.rpn) if proposals is None else proposals

@@ -50,6 +50,7 @@ class BBoxTestMixin(object):
         cls_score, bbox_pred = self.bbox_head(roi_feats)
         img_shape = img_meta[0]['img_shape']
         scale_factor = img_meta[0]['scale_factor']
+        label = img_meta[0]['label']
         det_bboxes, det_labels = self.bbox_head.get_det_bboxes(
             rois,
             cls_score,
@@ -57,7 +58,8 @@ class BBoxTestMixin(object):
             img_shape,
             scale_factor,
             rescale=rescale,
-            cfg=rcnn_test_cfg)
+            cfg=rcnn_test_cfg,
+            label=label)
         return det_bboxes, det_labels
 
     def aug_test_bboxes(self, feats, img_metas, proposal_list, rcnn_test_cfg):

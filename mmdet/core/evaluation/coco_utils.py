@@ -28,9 +28,11 @@ def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000)):
 
         coco_dets = coco.loadRes(result_file)
         img_ids = coco.getImgIds()
+        cat_ids = coco.getCatIds()
         iou_type = 'bbox' if res_type == 'proposal' else res_type
         cocoEval = COCOeval(coco, coco_dets, iou_type)
         cocoEval.params.imgIds = img_ids
+        cocoEval.params.catIds = cat_ids
         if res_type == 'proposal':
             cocoEval.params.useCats = 0
             cocoEval.params.maxDets = list(max_dets)

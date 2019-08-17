@@ -135,7 +135,8 @@ class BBoxHead(nn.Module):
                        img_shape,
                        scale_factor,
                        rescale=False,
-                       cfg=None):
+                       cfg=None,
+                       label=None):
         if isinstance(cls_score, list):
             cls_score = sum(cls_score) / float(len(cls_score))
         scores = F.softmax(cls_score, dim=1) if cls_score is not None else None
@@ -158,7 +159,7 @@ class BBoxHead(nn.Module):
             det_bboxes, det_labels = multiclass_nms(bboxes, scores,
                                                     cfg.score_thr, cfg.nms,
                                                     cfg.max_per_img)
-
+            import ipdb;ipdb.set_trace()
             return det_bboxes, det_labels
 
     @force_fp32(apply_to=('bbox_preds', ))

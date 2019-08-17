@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 from .registry import DATASETS
 from .transforms import (ImageTransform, BboxTransform, MaskTransform,
                          SegMapTransform, Numpy2Tensor)
-from .utils import to_tensor, random_scale
+from .utils import to_tensor, random_scale, zero_pad
 from .extra_aug import ExtraAugmentation
 
 
@@ -58,6 +58,7 @@ class CustomDataset(Dataset):
                  resize_keep_ratio=True,
                  skip_img_without_anno=True,
                  test_mode=False):
+        self.test_mode = test_mode
         # prefix of images path
         self.img_prefix = img_prefix
 
@@ -224,6 +225,7 @@ class CustomDataset(Dataset):
         img, img_shape, pad_shape, scale_factor = self.img_transform(
             img, img_scale, flip, keep_ratio=self.resize_keep_ratio)
         rf_img, _, _, _ = self.img_transform(rf_img, (192, 192))
+        rf_img = zero_pad(rf_img)
         img = img.copy()
         if self.with_seg:
             gt_seg = mmcv.imread(
@@ -285,7 +287,7 @@ class CustomDataset(Dataset):
         else:
             proposal = None
 
-        def prepare_single(img, scale, flip, proposal=None, rf_img=None):
+        def prepare_single(img, scale, flip, proposal=None, rf_img=None, cat=None):
             _img, img_shape, pad_shape, scale_factor = self.img_transform(
                 img, scale, flip, keep_ratio=self.resize_keep_ratio)
             _img = to_tensor(_img)
@@ -310,18 +312,22 @@ class CustomDataset(Dataset):
                 _proposal = None
             if rf_img is not None:
                 rf_img, _, _, _ = self.img_transform(rf_img, (192, 192))
+                rf_img = zero_pad(rf_img)
                 _img_meta['rf_img'] = rf_img
+            if cat is not None:
+                _img_meta['label'] = self.cat2label[cat[0]]
             return _img, _img_meta, _proposal
 
         imgs = []
         img_metas = []
         proposals = []
         self.split = 'Test'
-        ann = self.get_ann_info(idx, self.test_mode)
+        ann = self.get_ann_info(idx)
+
         rf_img = ann['rf_img']
         for scale in self.img_scales:
             _img, _img_meta, _proposal = prepare_single(
-                img, scale, False, proposal, rf_img)
+                img, scale, False, proposal, rf_img, ann['gt_labels'])
             imgs.append(_img)
             img_metas.append(DC(_img_meta, cpu_only=True))
             proposals.append(_proposal)
