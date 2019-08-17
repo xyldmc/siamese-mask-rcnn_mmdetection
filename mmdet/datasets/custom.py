@@ -287,7 +287,7 @@ class CustomDataset(Dataset):
         else:
             proposal = None
 
-        def prepare_single(img, scale, flip, proposal=None, rf_img=None, cat=None):
+        def prepare_single(img, scale, flip, proposal=None, rf_img=None, cat=None, img_id=None):
             _img, img_shape, pad_shape, scale_factor = self.img_transform(
                 img, scale, flip, keep_ratio=self.resize_keep_ratio)
             _img = to_tensor(_img)
@@ -315,7 +315,9 @@ class CustomDataset(Dataset):
                 rf_img = zero_pad(rf_img)
                 _img_meta['rf_img'] = rf_img
             if cat is not None:
-                _img_meta['label'] = self.cat2label[cat[0]]
+                # import ipdb;ipdb.set_trace()
+                _img_meta['label'] = cat[0]
+                _img_meta['img_id'] = img_id
             return _img, _img_meta, _proposal
 
         imgs = []
@@ -323,11 +325,11 @@ class CustomDataset(Dataset):
         proposals = []
         self.split = 'Test'
         ann = self.get_ann_info(idx)
-
+        img_id = ann['img_id']
         rf_img = ann['rf_img']
         for scale in self.img_scales:
             _img, _img_meta, _proposal = prepare_single(
-                img, scale, False, proposal, rf_img, ann['gt_labels'])
+                img, scale, False, proposal, rf_img, ann['labels'], img_id)
             imgs.append(_img)
             img_metas.append(DC(_img_meta, cpu_only=True))
             proposals.append(_proposal)

@@ -86,7 +86,6 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
     def matching(self, If, Rf):
         out = []
         for i in range(len(Rf)):
-            # import ipdb;ipdb.set_trace()
             rf_avg = self.avg(Rf[i])
             delta = If[i] - rf_avg
             conca = torch.cat((If[i], delta.abs()), dim=1)
@@ -218,22 +217,27 @@ class TwoStageDetector(BaseDetector, RPNTestMixin, BBoxTestMixin,
         """Test without augmentation."""
         assert self.with_bbox, "Bbox head must be implemented."
 
-        x = self.extract_feat(img. img_meta)
+        x = self.extract_feat(img, img_meta)
 
         proposal_list = self.simple_test_rpn(
             x, img_meta, self.test_cfg.rpn) if proposals is None else proposals
 
         det_bboxes, det_labels = self.simple_test_bboxes(
             x, img_meta, proposal_list, self.test_cfg.rcnn, rescale=rescale)
-        bbox_results = bbox2result(det_bboxes, det_labels,
-                                   self.bbox_head.num_classes)
+        det_labels, real_labels = det_labels
+        # import ipdb;ipdb.set_trace()
+        # bbox_results = bbox2result(det_bboxes, real_labels,
+        #                            self.bbox_head.num_classes)
+        bbox_results = bbox2result(det_bboxes, real_labels, 81)
 
         if not self.with_mask:
             return bbox_results
         else:
             segm_results = self.simple_test_mask(
-                x, img_meta, det_bboxes, det_labels, rescale=rescale)
-            return bbox_results, segm_results
+                x, img_meta, det_bboxes, det_labels, real_labels, rescale=rescale)
+            img_id = img_meta[0]['img_id']
+            label = img_meta[0]['label']
+            return (bbox_results, segm_results), img_id, label
 
     def aug_test(self, imgs, img_metas, rescale=False):
         """Test with augmentations.

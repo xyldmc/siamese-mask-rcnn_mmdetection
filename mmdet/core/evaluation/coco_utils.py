@@ -6,7 +6,7 @@ from pycocotools.cocoeval import COCOeval
 from .recall import eval_recalls
 
 
-def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000)):
+def coco_eval(result_files, result_types, coco, img_ids_=None, cat_ids_=None, max_dets=(100, 300, 1000)):
     for res_type in result_types:
         assert res_type in [
             'proposal', 'proposal_fast', 'bbox', 'segm', 'keypoints'
@@ -25,12 +25,19 @@ def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000)):
     for res_type in result_types:
         result_file = result_files[res_type]
         assert result_file.endswith('.json')
-
         coco_dets = coco.loadRes(result_file)
-        img_ids = coco.getImgIds()
-        cat_ids = coco.getCatIds()
         iou_type = 'bbox' if res_type == 'proposal' else res_type
         cocoEval = COCOeval(coco, coco_dets, iou_type)
+        # import ipdb;ipdb.set_trace()
+        cat_ids_all = coco.getCatIds()
+        label2cat = {
+            i + 1: cat_id
+            for i, cat_id in enumerate(cat_ids_all)
+        }
+        img_ids = np.unique(np.array(img_ids_)).tolist()
+        cat_ids = np.unique(np.array(cat_ids_)).tolist()
+        for i in range(len(cat_ids)):
+            cat_ids[i] = label2cat[cat_ids[i]]
         cocoEval.params.imgIds = img_ids
         cocoEval.params.catIds = cat_ids
         if res_type == 'proposal':
@@ -126,6 +133,7 @@ def segm2json(dataset, results):
     for idx in range(len(dataset)):
         img_id = dataset.img_ids[idx]
         det, seg = results[idx]
+        # import ipdb;ipdb.set_trace()
         for label in range(len(det)):
             # bbox results
             bboxes = det[label]

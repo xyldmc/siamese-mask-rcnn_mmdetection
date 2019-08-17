@@ -1,5 +1,6 @@
 from mmdet.core import (bbox2roi, bbox_mapping, merge_aug_proposals,
                         merge_aug_bboxes, merge_aug_masks, multiclass_nms)
+import torch
 
 
 class RPNTestMixin(object):
@@ -58,9 +59,11 @@ class BBoxTestMixin(object):
             img_shape,
             scale_factor,
             rescale=rescale,
-            cfg=rcnn_test_cfg,
-            label=label)
-        return det_bboxes, det_labels
+            cfg=rcnn_test_cfg)
+        real_labels = torch.ones(det_labels.shape)
+        real_labels *= label
+        real_labels -= 1
+        return det_bboxes, (det_labels, real_labels.long())
 
     def aug_test_bboxes(self, feats, img_metas, proposal_list, rcnn_test_cfg):
         aug_bboxes = []
@@ -107,6 +110,7 @@ class MaskTestMixin(object):
                          img_meta,
                          det_bboxes,
                          det_labels,
+                         real_labels,
                          rescale=False):
         # image shape of the first image in the batch (only one)
         ori_shape = img_meta[0]['ori_shape']
@@ -126,6 +130,7 @@ class MaskTestMixin(object):
             mask_pred = self.mask_head(mask_feats)
             segm_result = self.mask_head.get_seg_masks(mask_pred, _bboxes,
                                                        det_labels,
+                                                       real_labels,
                                                        self.test_cfg.rcnn,
                                                        ori_shape, scale_factor,
                                                        rescale)

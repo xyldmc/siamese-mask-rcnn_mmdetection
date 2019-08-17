@@ -19,20 +19,23 @@ from mmdet.models import build_detector
 def single_gpu_test(model, data_loader, show=False):
     model.eval()
     results = []
+    img_ids = []
+    cat_ids = []
     dataset = data_loader.dataset
     prog_bar = mmcv.ProgressBar(len(dataset))
     for i, data in enumerate(data_loader):
         with torch.no_grad():
-            result = model(return_loss=False, rescale=not show, **data)
+            result, img_id, cat_id = model(return_loss=False, rescale=not show, **data)
         results.append(result)
-
+        img_ids.append(img_id)
+        cat_ids.append(cat_id)
         if show:
             model.module.show_result(data, result, dataset.img_norm_cfg)
 
         batch_size = data['img'][0].size(0)
         for _ in range(batch_size):
             prog_bar.update()
-    return results
+    return results, img_ids, cat_ids
 
 
 def multi_gpu_test(model, data_loader, tmpdir=None):
@@ -181,7 +184,7 @@ def main():
 
     if not distributed:
         model = MMDataParallel(model, device_ids=[0])
-        outputs = single_gpu_test(model, data_loader, args.show)
+        outputs, img_ids, cat_ids = single_gpu_test(model, data_loader, args.show)
     else:
         model = MMDistributedDataParallel(model.cuda())
         outputs = multi_gpu_test(model, data_loader, args.tmpdir)
@@ -199,7 +202,7 @@ def main():
             else:
                 if not isinstance(outputs[0], dict):
                     result_files = results2json(dataset, outputs, args.out)
-                    coco_eval(result_files, eval_types, dataset.coco)
+                    coco_eval(result_files, eval_types, dataset.coco, img_ids, cat_ids)
                 else:
                     for name in outputs[0]:
                         print('\nEvaluating {}'.format(name))

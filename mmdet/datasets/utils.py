@@ -20,13 +20,16 @@ def prepare_rf(img, ann, cat):
 def prepare_rf_test(img, ann):
     x, y, w, h = np.array(ann['bbox']).astype(int)
     crop = img[y:y + h + 1, x:x + w + 1, :]
+    # import matplotlib.pyplot as plt
+    # plt.imshow(crop)
+    # plt.show()
     return crop
 
 
 def zero_pad(img):
     _, h, w = img.shape
     max_ = np.max(img.shape)
-    pad = np.pad(img,((0, 0), (0, max_-h), (0, max_-w)) , 'constant', constant_values = (0, 0))
+    pad = np.pad(img,((0, 0), (0, max_-h), (0, max_-w)) , 'constant', constant_values=(0, 0))
     return pad
 
 

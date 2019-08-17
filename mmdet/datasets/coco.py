@@ -71,7 +71,7 @@ class CocoDataset(CustomDataset):
                 info = self.coco.loadImgs([i])[0]
                 info['filename'] = info['file_name']
                 img_infos.append(info)
-        return img_infos
+        return img_infos[:100]
 
     def get_ann_info(self, idx):
         img_id = self.img_infos[idx]['id']
@@ -134,8 +134,8 @@ class CocoDataset(CustomDataset):
                 gt_bboxes_ignore.append(bbox)
             elif ann['category_id'] == category_id:
                 gt_bboxes.append(bbox)
-                # gt_labels.append(self.cat2label[ann['category_id']])
-                gt_labels.append(1)
+                gt_labels.append(self.cat2label[ann['category_id']])
+                # gt_labels.append(1)
             else:
                 continue
             if with_mask:
@@ -160,10 +160,10 @@ class CocoDataset(CustomDataset):
 
         ann = dict(
             rf_img=rf_img,
+            img_id=img_id,
             bboxes=gt_bboxes,
             labels=gt_labels,
             bboxes_ignore=gt_bboxes_ignore)
-
         if with_mask:
             ann['masks'] = gt_masks
             # poly format is not used in the current implementation

@@ -120,7 +120,7 @@ class FCNMaskHead(nn.Module):
         loss['loss_mask'] = loss_mask
         return loss
 
-    def get_seg_masks(self, mask_pred, det_bboxes, det_labels, rcnn_test_cfg,
+    def get_seg_masks(self, mask_pred, det_bboxes, det_labels, real_labels, rcnn_test_cfg,
                       ori_shape, scale_factor, rescale):
         """Get segmentation masks from mask_pred and bboxes.
 
@@ -145,9 +145,10 @@ class FCNMaskHead(nn.Module):
         # numpy array
         mask_pred = mask_pred.astype(np.float32)
 
-        cls_segms = [[] for _ in range(self.num_classes - 1)]
+        cls_segms = [[] for _ in range(80)]
         bboxes = det_bboxes.cpu().numpy()[:, :4]
         labels = det_labels.cpu().numpy() + 1
+        real_labels = real_labels.cpu().numpy()
 
         if rescale:
             img_h, img_w = ori_shape[:2]
@@ -159,6 +160,7 @@ class FCNMaskHead(nn.Module):
         for i in range(bboxes.shape[0]):
             bbox = (bboxes[i, :] / scale_factor).astype(np.int32)
             label = labels[i]
+            real_label = real_labels[i]
             w = max(bbox[2] - bbox[0] + 1, 1)
             h = max(bbox[3] - bbox[1] + 1, 1)
 
@@ -174,6 +176,6 @@ class FCNMaskHead(nn.Module):
             im_mask[bbox[1]:bbox[1] + h, bbox[0]:bbox[0] + w] = bbox_mask
             rle = mask_util.encode(
                 np.array(im_mask[:, :, np.newaxis], order='F'))[0]
-            cls_segms[label - 1].append(rle)
+            cls_segms[real_label].append(rle)
 
         return cls_segms
