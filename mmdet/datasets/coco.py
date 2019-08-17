@@ -71,7 +71,7 @@ class CocoDataset(CustomDataset):
                 info = self.coco.loadImgs([i])[0]
                 info['filename'] = info['file_name']
                 img_infos.append(info)
-        return img_infos[:100]
+        return img_infos
 
     def get_ann_info(self, idx):
         img_id = self.img_infos[idx]['id']

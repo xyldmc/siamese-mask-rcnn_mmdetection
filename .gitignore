@@ -114,6 +114,8 @@ data
 *.pkl
 *.pkl.json
 *.log.json
+*.pkl.bbox.json
+*.pkl.segm.json
 work_dirs/
 
 # Pytorch
