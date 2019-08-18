@@ -50,7 +50,7 @@ def coco_eval(result_files, result_types, coco, img_ids_=None, cat_ids_=None, ma
         #     img = io.imread(img['coco_url'])
         #     plt.figure(1)
         #     plt.imshow(img)
-        #     annIds = coco_dets.getAnnIds(img_ids[i], iscrowd=None)
+        #     annIds = coco_dets.getAnnIds(img_ids[i])
         #     anns = coco_dets.loadAnns(annIds)
         #     coco.showAnns(anns)
         #     plt.show()
@@ -126,10 +126,10 @@ def proposal2json(dataset, results):
     return json_results
 
 
-def det2json(dataset, results):
+def det2json(dataset, results, img_ids):
     json_results = []
     for idx in range(len(dataset)):
-        img_id = dataset.img_ids[idx]
+        img_id = img_ids[idx]
         result = results[idx]
         for label in range(len(result)):
             bboxes = result[label]
@@ -143,13 +143,12 @@ def det2json(dataset, results):
     return json_results
 
 
-def segm2json(dataset, results):
+def segm2json(dataset, results, img_ids):
     bbox_json_results = []
     segm_json_results = []
     for idx in range(len(dataset)):
-        img_id = dataset.img_ids[idx]
+        img_id = img_ids[idx]
         det, seg = results[idx]
-        # import ipdb;ipdb.set_trace()
         for label in range(len(det)):
             # bbox results
             bboxes = det[label]
@@ -180,15 +179,15 @@ def segm2json(dataset, results):
     return bbox_json_results, segm_json_results
 
 
-def results2json(dataset, results, out_file):
+def results2json(dataset, results, out_file, img_ids):
     result_files = dict()
     if isinstance(results[0], list):
-        json_results = det2json(dataset, results)
+        json_results = det2json(dataset, results, img_ids)
         result_files['bbox'] = '{}.{}.json'.format(out_file, 'bbox')
         result_files['proposal'] = '{}.{}.json'.format(out_file, 'bbox')
         mmcv.dump(json_results, result_files['bbox'])
     elif isinstance(results[0], tuple):
-        json_results = segm2json(dataset, results)
+        json_results = segm2json(dataset, results, img_ids)
         result_files['bbox'] = '{}.{}.json'.format(out_file, 'bbox')
         result_files['proposal'] = '{}.{}.json'.format(out_file, 'bbox')
         result_files['segm'] = '{}.{}.json'.format(out_file, 'segm')

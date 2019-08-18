@@ -201,7 +201,7 @@ def main():
                 coco_eval(result_file, eval_types, dataset.coco)
             else:
                 if not isinstance(outputs[0], dict):
-                    result_files = results2json(dataset, outputs, args.out)
+                    result_files = results2json(dataset, outputs, args.out, img_ids)
                     coco_eval(result_files, eval_types, dataset.coco, img_ids, cat_ids)
                 else:
                     for name in outputs[0]:
