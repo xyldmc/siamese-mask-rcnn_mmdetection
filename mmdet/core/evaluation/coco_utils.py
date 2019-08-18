@@ -40,6 +40,22 @@ def coco_eval(result_files, result_types, coco, img_ids_=None, cat_ids_=None, ma
             cat_ids[i] = label2cat[cat_ids[i]]
         cocoEval.params.imgIds = img_ids
         cocoEval.params.catIds = cat_ids
+
+        # import matplotlib.pyplot as plt
+        # import skimage.io as io
+        # for i in range(0, len(img_ids)):
+        #     i = 0
+        #     img = coco.loadImgs(img_ids[i])[0]
+        #     print(img_ids[i])
+        #     img = io.imread(img['coco_url'])
+        #     plt.figure(1)
+        #     plt.imshow(img)
+        #     annIds = coco_dets.getAnnIds(img_ids[i], iscrowd=None)
+        #     anns = coco_dets.loadAnns(annIds)
+        #     coco.showAnns(anns)
+        #     plt.show()
+        #     import ipdb;ipdb.set_trace()
+
         if res_type == 'proposal':
             cocoEval.params.useCats = 0
             cocoEval.params.maxDets = list(max_dets)

@@ -173,10 +173,10 @@ log_config = dict(
 # yapf:enable
 evaluation = dict(interval=1)
 # runtime settings
-total_epochs = 48
+total_epochs = 90
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/siamese_mask_rcnn_val_48'
+work_dir = './work_dirs/siamese_mask_rcnn_val_90'
 # work_dir = './work_dirs/debug'
 load_from = None
 resume_from = None
