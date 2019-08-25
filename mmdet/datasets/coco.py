@@ -60,7 +60,7 @@ class CocoDataset(CustomDataset):
                 for img_ann in img_anns:
                     if img_ann['category_id'] in img_cats:
                         continue
-                    elif img_ann['category_id'] in self.cats[0]:
+                    elif img_ann['category_id'] in self.cats[1]:
                         img_cats.append(img_ann['category_id'])
                         tmp_info = copy.deepcopy(info)
                         tmp_info['category_id'] = img_ann['category_id']
@@ -71,7 +71,7 @@ class CocoDataset(CustomDataset):
                 info = self.coco.loadImgs([i])[0]
                 info['filename'] = info['file_name']
                 img_infos.append(info)
-        return img_infos[:]
+        return img_infos[-100:]
 
     def get_ann_info(self, idx):
         img_id = self.img_infos[idx]['id']

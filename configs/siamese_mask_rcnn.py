@@ -118,11 +118,11 @@ img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 data = dict(
     imgs_per_gpu=3,
-    workers_per_gpu=8,
+    workers_per_gpu=0,
     train=dict(
         type=dataset_type,
-        ann_file=data_root + 'annotations/instances_val2017.json',
-        img_prefix=data_root + 'val2017/',
+        ann_file=data_root + 'annotations/instances_train2017.json',
+        img_prefix=data_root + 'train2017/',
         img_scale=(1024, 1024),
         img_norm_cfg=img_norm_cfg,
         size_divisor=32,
@@ -173,10 +173,10 @@ log_config = dict(
 # yapf:enable
 evaluation = dict(interval=1)
 # runtime settings
-total_epochs = 90
+total_epochs = 12
 dist_params = dict(backend='nccl')
 log_level = 'INFO'
-work_dir = './work_dirs/siamese_mask_rcnn_val_90'
+work_dir = './work_dirs/siamese_mask_rcnn_train_12'
 # work_dir = './work_dirs/debug'
 load_from = None
 resume_from = None
