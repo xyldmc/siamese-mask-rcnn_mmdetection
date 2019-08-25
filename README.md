@@ -5,7 +5,7 @@
 This is **pytorch** version of [siamese Mask-RCNN](https://arxiv.org/abs/1811.11507) and we use [mmdetection](https://github.com/open-mmlab/mmdetection) toolbox to finish it.
 
 # Installation
-Please follow the installation in **README_mmdetection.md** or the steps in mmdetection in github
+Please follow the installation in **README_mmdetection.md** or the steps in [mmdetection](https://github.com/open-mmlab/mmdetection)
 
 # Citation
 This project is based on [mmdetection](https://github.com/open-mmlab/mmdetection) toolbox.
