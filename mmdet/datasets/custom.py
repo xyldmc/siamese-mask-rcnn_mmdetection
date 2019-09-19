@@ -199,7 +199,6 @@ class CustomDataset(Dataset):
                 proposals = proposals[:, :4]
             else:
                 scores = None
-        self.split = 'Train'
         ann = self.get_ann_info(idx)
         rf_img = ann['rf_img']
         gt_bboxes = ann['bboxes']
@@ -323,7 +322,6 @@ class CustomDataset(Dataset):
         imgs = []
         img_metas = []
         proposals = []
-        self.split = 'Test'
         ann = self.get_ann_info(idx)
         img_id = ann['img_id']
         rf_img = ann['rf_img']

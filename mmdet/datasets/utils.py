@@ -20,9 +20,9 @@ def prepare_rf(img, ann, cat):
 def prepare_rf_test(img, ann):
     x, y, w, h = np.array(ann['bbox']).astype(int)
     crop = img[y:y + h + 1, x:x + w + 1, :]
-    import matplotlib.pyplot as plt
-    plt.imshow(crop)
-    plt.show()
+    # import matplotlib.pyplot as plt
+    # plt.imshow(crop)
+    # plt.show()
     return crop
 
 

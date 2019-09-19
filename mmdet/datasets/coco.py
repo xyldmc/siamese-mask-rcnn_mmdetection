@@ -70,7 +70,15 @@ class CocoDataset(CustomDataset):
             else:
                 info = self.coco.loadImgs([i])[0]
                 info['filename'] = info['file_name']
-                img_infos.append(info)
+                img_anns_ids = self.coco.getAnnIds(imgIds=i)
+                img_anns = self.coco.loadAnns(img_anns_ids)
+                cat_flag = False
+                for img_ann in img_anns:
+                    if img_ann['category_id'] in self.cats[0]:
+                        cat_flag = True
+                        break
+                if cat_flag:
+                    img_infos.append(info)
         return img_infos[:]
 
     def get_ann_info(self, idx):
@@ -78,8 +86,7 @@ class CocoDataset(CustomDataset):
         ann_ids = self.coco.getAnnIds(imgIds=[img_id])
         ann_info = self.coco.loadAnns(ann_ids)
         if not self.test_mode:
-            return self._parse_ann_info(ann_info, img_id, self.split,
-                                        self.with_mask)
+            return self._parse_ann_info(ann_info, img_id, self.with_mask)
         else:
             category_id = self.img_infos[idx]['category_id']
             return self._parse_test_ann_info(ann_ids, ann_info, img_id,
@@ -171,7 +178,7 @@ class CocoDataset(CustomDataset):
             ann['poly_lens'] = gt_poly_lens
         return ann
 
-    def _parse_ann_info(self, ann_info, img_id, split='Train', with_mask=True):
+    def _parse_ann_info(self, ann_info, img_id, with_mask=True):
         """Parse bbox and mask annotation.
 
         Args:
@@ -190,26 +197,24 @@ class CocoDataset(CustomDataset):
         # 2. polys: each mask consists of one or several polys, each poly is a
         # list of float.
 
-        if split == 'Train':
-            i = 0
-        else:
-            i = 1
-        flag = True
-        while flag:
+        i = 0
+        index = np.random.randint(len(ann_info))
+        cat = ann_info[index]['category_id']
+        while cat not in self.cats[i]:
             index = np.random.randint(len(ann_info))
             cat = ann_info[index]['category_id']
-            for j in range(len(self.cats[i])):
-                if cat == self.cats[i][j]:
-                    break
 
-            rf_ids = self.coco.getImgIds(catIds=[cat])
+        rf_ids = self.coco.getImgIds(catIds=[cat])
+        rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
+        while rf_id == img_id:
             rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
-            while rf_id == img_id:
-                rf_id = rf_ids[np.random.randint(0, len(rf_ids))]
+
+        rf_ann = self.coco.loadAnns(
+            self.coco.getAnnIds(imgIds=rf_id, iscrowd=False))
+        while len(rf_ann) == 0:
             rf_ann = self.coco.loadAnns(
                 self.coco.getAnnIds(imgIds=rf_id, iscrowd=False))
-            if len(rf_ann) > 0:
-                flag = False
+
         rf_img_file = self.coco.loadImgs([rf_id])[0]['file_name']
         rf_img = mmcv.imread(osp.join(self.img_prefix, rf_img_file))
         rf_img = prepare_rf(rf_img, rf_ann, cat)

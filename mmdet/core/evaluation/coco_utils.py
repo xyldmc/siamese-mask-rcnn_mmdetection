@@ -38,9 +38,9 @@ def coco_eval(result_files, result_types, coco, img_ids_=None, cat_ids_=None, ma
         cat_ids = np.unique(np.array(cat_ids_)).tolist()
         for i in range(len(cat_ids)):
             cat_ids[i] = label2cat[cat_ids[i]]
-        cocoEval.params.imgIds = img_ids
+        # cocoEval.params.imgIds = img_ids
         cocoEval.params.catIds = cat_ids
-
+        # import ipdb; ipdb.set_trace()
         # import matplotlib.pyplot as plt
         # import skimage.io as io
         # for i in range(0, len(img_ids)):
