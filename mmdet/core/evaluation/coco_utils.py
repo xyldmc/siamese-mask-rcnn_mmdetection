@@ -38,7 +38,7 @@ def coco_eval(result_files, result_types, coco, img_ids_=None, cat_ids_=None, ma
         cat_ids = np.unique(np.array(cat_ids_)).tolist()
         for i in range(len(cat_ids)):
             cat_ids[i] = label2cat[cat_ids[i]]
-        # cocoEval.params.imgIds = img_ids
+        cocoEval.params.imgIds = img_ids
         cocoEval.params.catIds = cat_ids
         # import ipdb; ipdb.set_trace()
         # import matplotlib.pyplot as plt
@@ -165,6 +165,8 @@ def segm2json(dataset, results, img_ids):
             if len(seg) == 2:
                 segms = seg[0][label]
                 mask_score = seg[1][label]
+            elif len(seg) == 1:
+                continue
             else:
                 segms = seg[label]
                 mask_score = [bbox[4] for bbox in bboxes]

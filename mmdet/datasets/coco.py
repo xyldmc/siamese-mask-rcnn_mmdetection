@@ -79,7 +79,7 @@ class CocoDataset(CustomDataset):
                         break
                 if cat_flag:
                     img_infos.append(info)
-        return img_infos[:]
+        return img_infos[-500:]
 
     def get_ann_info(self, idx):
         img_id = self.img_infos[idx]['id']
@@ -124,7 +124,8 @@ class CocoDataset(CustomDataset):
                 break
         rf_img_file = self.coco.loadImgs(rf_ann['image_id'])[0]['file_name']
         rf_img = mmcv.imread(osp.join(self.img_prefix, rf_img_file))
-        rf_img = prepare_rf_test(rf_img, rf_ann)
+        cls_name = self.CLASSES[self.cat2label[ann['category_id']] - 1]
+        rf_img = prepare_rf_test(rf_img, rf_ann, cls_name)
 
         if with_mask:
             gt_masks = []

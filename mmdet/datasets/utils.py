@@ -17,12 +17,13 @@ def prepare_rf(img, ann, cat):
     return crop
 
 
-def prepare_rf_test(img, ann):
+def prepare_rf_test(img, ann, cls_name):
     x, y, w, h = np.array(ann['bbox']).astype(int)
     crop = img[y:y + h + 1, x:x + w + 1, :]
-    # import matplotlib.pyplot as plt
-    # plt.imshow(crop)
-    # plt.show()
+    import matplotlib.pyplot as plt
+    plt.imshow(crop)
+    plt.text(-1, -1, '{}'.format(cls_name), fontsize=30)
+    plt.show()
     return crop
 
 
